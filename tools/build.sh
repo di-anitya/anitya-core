@@ -28,10 +28,6 @@ if [ $(get_os_distribution) == "redhat" -o $(get_os_distribution) == "fedora"  ]
 
   \cp -fp ${BASE_DIR}/files/usr/lib/systemd/system/anitya-api.service /usr/lib/systemd/system/anitya-api.service
 
-  cd /etc/systemd/system/
-  rm -f anitya-api.service
-  ln -s /usr/lib/systemd/system/anitya-api.service anitya-api.service
-
   echo "** reloading daemon"
   systemctl daemon-reload
 
