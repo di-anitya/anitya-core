@@ -1,0 +1,12 @@
+[Unit]
+Description = Anitya API Server
+
+[Service]
+ExecStart = /usr/share/anitya/core/bin/api-server
+ExecStop = /bin/kill -HUP $MAINPID
+ExecReload = /bin/kill -HUP $MAINPID && /usr/share/anitya/core/bin/api-server
+Type = oneshot
+Restart = no
+
+[Install]
+WantedBy = multi-user.target
