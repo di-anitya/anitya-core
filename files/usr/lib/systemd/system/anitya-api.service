@@ -5,7 +5,7 @@ Description = Anitya API Server
 ExecStart = /usr/share/anitya/core/bin/api-server
 ExecStop = /bin/kill -HUP $MAINPID
 ExecReload = /bin/kill -HUP $MAINPID && /usr/share/anitya/core/bin/api-server
-Type = oneshot
+Type = simple
 Restart = no
 
 [Install]

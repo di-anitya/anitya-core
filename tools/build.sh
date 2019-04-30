@@ -14,11 +14,30 @@ get_os_distribution() {
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 BASE_DIR=${SCRIPT_DIR}/../
 
+echo "** building the source codes.."
+
 cd ${BASE_DIR}/bin
-go build ${BASE_DIR}/src/*.go
+go build -o api-server ${BASE_DIR}/src/api_server/*.go
+#go build ${BASE_DIR}/src/grpc_client/*.go
+#go build ${BASE_DIR}/src/notification/*.go
+#go build ${BASE_DIR}/src/scheduler/*.go
+
 
 if [ $(get_os_distribution) == "redhat" -o $(get_os_distribution) == "fedora"  ]; then
-  cp -p ${BASE_DIR}/files/usr/lib/systemd/system/anitya-api.service /usr/lib/systemd/system/anitya-api.service
+  echo "** define anitya-api.service"
+
+  \cp -fp ${BASE_DIR}/files/usr/lib/systemd/system/anitya-api.service /usr/lib/systemd/system/anitya-api.service
+
   cd /etc/systemd/system/
+  rm -f anitya-api.service
   ln -s /usr/lib/systemd/system/anitya-api.service anitya-api.service
+
+  echo "** reloading daemon"
+  systemctl daemon-reload
+
+  echo "** starting anitya-api.service"
+  systemctl start anitya-api.service
+
+  echo "** enabling anitya-api.service"
+  systemctl enable anitya-api.service
 fi
