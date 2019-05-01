@@ -15,7 +15,7 @@ func main() {
 
 	libs.InitDB()
 
-	e.POST("/v1/auth/token", v1.Token())
+	e.POST("/v1/auth/tokens", v1.Token())
 
 	api_v1 := e.Group("/v1")
 	api_v1.Use(middleware.JWT([]byte("secret1")))
