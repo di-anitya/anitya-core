@@ -1,34 +1,87 @@
 package main
 
 import (
-	v1 "./handler_v1"
-	"./libs"
-	ext "./middleware"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"fmt"
+	"net/http"
+	"os"
+
+	ctrv1 "./controllers/v1"
+	handler "./handler"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
 
-	libs.InitDB()
+	router := mux.NewRouter()
+	router.Use(handler.JwtAuthentication) //attach JWT auth middleware
 
-	e.POST("/v1/auth/tokens", v1.Token())
+	v1 := router.PathPrefix("/api/v1").Subrouter()
 
-	api_v1 := e.Group("/v1")
-	api_v1.Use(middleware.JWT([]byte("secret1")))
-	api_v1.GET("/auth/version", v1.Version())
-	api_v1.POST("/auth/users", v1.User())
+	v1.HandleFunc("/auth/tokens", ctrv1.PublishToken).Methods("POST")
 
-	r2 := e.Group("/v1/auth/renew")
-	config := middleware.JWTConfig{
-		Claims:     &ext.MyClaim{},
-		SigningKey: []byte("secret2"),
+	v1.HandleFunc("/project", ctrv1.CreateProject).Methods("POST")
+	v1.HandleFunc("/project", ctrv1.ListProject).Methods("GET")
+	v1.HandleFunc("/project/{project_id}", ctrv1.ShowProject).Methods("GET")
+	v1.HandleFunc("/project/{project_id}", ctrv1.ModifyProject).Methods("PATCH")
+	v1.HandleFunc("/project/{project_id}", ctrv1.DeleteProject).Methods("DELETE")
+
+	v1.HandleFunc("/role", ctrv1.CreateRole).Methods("POST")
+	v1.HandleFunc("/role", ctrv1.ListRole).Methods("GET")
+	v1.HandleFunc("/role/{role_id}", ctrv1.ShowRole).Methods("GET")
+	v1.HandleFunc("/role/{role_id}", ctrv1.ModifyRole).Methods("PATCH")
+	v1.HandleFunc("/role/{role_id}", ctrv1.DeleteRole).Methods("DELETE")
+
+	v1.HandleFunc("/user", ctrv1.CreateUser).Methods("POST")
+	v1.HandleFunc("/user", ctrv1.ListUser).Methods("GET")
+	v1.HandleFunc("/user/{user_id}", ctrv1.ShowUser).Methods("GET")
+	v1.HandleFunc("/user/{user_id}", ctrv1.ModifyUser).Methods("PATCH")
+	v1.HandleFunc("/user/{user_id}", ctrv1.DeleteUser).Methods("DELETE")
+
+	v1.HandleFunc("/dashboard", ctrv1.CreateDashboardConfig).Methods("POST")
+	v1.HandleFunc("/dashboard/{dashboard_id}", ctrv1.ShowDashboardConfig).Methods("GET")
+	v1.HandleFunc("/dashboard/{dashboard_id}", ctrv1.ModifyDashboardConfig).Methods("PATCH")
+	v1.HandleFunc("/dashboard/{dashboard_id}", ctrv1.DeleteDashboardConfig).Methods("DELETE")
+
+	v1.HandleFunc("/probepoint", ctrv1.CreateProbePoint).Methods("POST")
+	v1.HandleFunc("/probepoint", ctrv1.ListProbePoint).Methods("GET")
+	v1.HandleFunc("/probepoint/{probepoint_id}", ctrv1.ShowProbePoint).Methods("GET")
+	v1.HandleFunc("/probepoint/{probepoint_id}", ctrv1.ModifyProbePoint).Methods("PATCH")
+	v1.HandleFunc("/probepoint/{probepoint_id}", ctrv1.DeleteProbePoint).Methods("DELETE")
+
+	v1.HandleFunc("/monitoring/http", ctrv1.CreateHTTPMonitoringConfig).Methods("POST")
+	v1.HandleFunc("/monitoring/http", ctrv1.ListHTTPMonitoringConfig).Methods("GET")
+	v1.HandleFunc("/monitoring/http/{http_id}", ctrv1.ShowHTTPMonitoringConfig).Methods("GET")
+	v1.HandleFunc("/monitoring/http/{http_id}", ctrv1.ModifyHTTPMonitoringConfig).Methods("PATCH")
+	v1.HandleFunc("/monitoring/http/{http_id}", ctrv1.DeleteHTTPMonitoringConfig).Methods("DELETE")
+
+	v1.HandleFunc("/monitoring/dns", ctrv1.CreateDNSMonitoringConfig).Methods("POST")
+	v1.HandleFunc("/monitoring/dns", ctrv1.ListDNSMonitoringConfig).Methods("GET")
+	v1.HandleFunc("/monitoring/dns/{dns_id}", ctrv1.ShowDNSMonitoringConfig).Methods("GET")
+	v1.HandleFunc("/monitoring/dns/{dns_id}", ctrv1.ModifyDNSMonitoringConfig).Methods("PATCH")
+	v1.HandleFunc("/monitoring/dns/{dns_id}", ctrv1.DeleteDNSMonitoringConfig).Methods("DELETE")
+
+	v1.HandleFunc("/notification/history", ctrv1.CreateNotificationHistory).Methods("POST")
+	v1.HandleFunc("/notification/history", ctrv1.ListNotificationHistory).Methods("GET")
+	v1.HandleFunc("/notification/history/{notification_id}", ctrv1.ShowNotificationHistory).Methods("GET")
+	v1.HandleFunc("/notification/history/{notification_id}", ctrv1.ModifyNotificationHistory).Methods("PATCH")
+	v1.HandleFunc("/notification/history/{notification_id}", ctrv1.DeleteNotificationHistory).Methods("DELETE")
+
+	v1.HandleFunc("/notification/slack", ctrv1.CreateNotificationSlack).Methods("POST")
+	v1.HandleFunc("/notification/slack", ctrv1.ListNotificationSlack).Methods("GET")
+	v1.HandleFunc("/notification/slack/{notification_id}", ctrv1.ShowNotificationSlack).Methods("GET")
+	v1.HandleFunc("/notification/slack/{notification_id}", ctrv1.ModifyNotificationSlack).Methods("PATCH")
+	v1.HandleFunc("/notification/slack/{notification_id}", ctrv1.DeleteNotificationSlack).Methods("DELETE")
+
+	port := os.Getenv("PORT") //Get port from .env file, we did not specify any port so this should return an empty string when tested locally
+	if port == "" {
+		port = "8080" //localhost
 	}
-	r2.Use(middleware.JWTWithConfig(config))
-	r2.POST("", v1.ReAuth())
 
-	e.Start(":3000")
+	fmt.Println("api-server is running.. (0.0.0.0:" + port + ")")
+
+	err := http.ListenAndServe(":"+port, router) //Launch the app, visit localhost:8000/api
+	if err != nil {
+		fmt.Print(err)
+	}
 }
