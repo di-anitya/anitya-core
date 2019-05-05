@@ -43,21 +43,27 @@ var ShowHTTPMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyHTTPMonitoringConfig controller
-var ModifyHTTPMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//monitoringID := params["monitoring_id"]
+// ModifyAndShowHTTPMonitoringConfig controller
+var ModifyAndShowHTTPMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
+	httpMonitoringConfig := &models.HTTPMonitoringConfig{}
+	vars := mux.Vars(r)
 
-	monitoring := &models.HTTPMonitoringConfig{}
-	err := json.NewDecoder(r.Body).Decode(monitoring) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	httpMonitoringConfigID := vars["httpMonitoringConfig_id"]
+	existHTTPMonitoringConfig := ShowHTTPMonitoringConfig
+	if existHTTPMonitoringConfig == nil {
 		return
 	}
 
-	//monitoring := models.ModifyHTTPMonitoringConfig(monitoringID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&httpMonitoringConfig); err != nil {
+		println(err)
+		return
+	}
+	httpMonitoringConfig.ModifyHTTPMonitoringConfig(httpMonitoringConfigID)
 	resp := common.Message(true, "success")
-	resp["monitoring"] = monitoring
+
+	respHTTPMonitoringConfig := models.ShowHTTPMonitoringConfig(httpMonitoringConfigID)
+	resp["httpMonitoringConfig"] = respHTTPMonitoringConfig
 	common.Respond(w, resp)
 }
 
@@ -105,21 +111,27 @@ var ShowDNSMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyDNSMonitoringConfig controller
-var ModifyDNSMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//monitoringID := params["monitoring_id"]
+// ModifyAndShowDNSMonitoringConfig controller
+var ModifyAndShowDNSMonitoringConfig = func(w http.ResponseWriter, r *http.Request) {
+	dnsMonitoringConfig := &models.DNSMonitoringConfig{}
+	vars := mux.Vars(r)
 
-	monitoring := &models.HTTPMonitoringConfig{}
-	err := json.NewDecoder(r.Body).Decode(monitoring) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	dnsMonitoringConfigID := vars["dnsMonitoringConfig_id"]
+	existDNSMonitoringConfig := ShowDNSMonitoringConfig
+	if existDNSMonitoringConfig == nil {
 		return
 	}
 
-	//monitoring := models.ModifyDNSMonitoringConfig(monitoringID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&dnsMonitoringConfig); err != nil {
+		println(err)
+		return
+	}
+	dnsMonitoringConfig.ModifyDNSMonitoringConfig(dnsMonitoringConfigID)
 	resp := common.Message(true, "success")
-	resp["monitoring"] = monitoring
+
+	respDNSMonitoringConfig := models.ShowDNSMonitoringConfig(dnsMonitoringConfigID)
+	resp["dnsMonitoringConfig"] = respDNSMonitoringConfig
 	common.Respond(w, resp)
 }
 

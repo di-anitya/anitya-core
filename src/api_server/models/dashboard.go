@@ -35,13 +35,10 @@ func (dashboard *DashboardConfig) CreateDashboardConfig() map[string]interface{}
 }
 
 // ListDashboardConfig function
-func ListDashboardConfig() *DashboardConfig {
-	dashboard := &DashboardConfig{}
-	err := GetDB().Table("dashboards").Find(dashboard).Error
-	if err != nil {
-		return nil
-	}
-	return dashboard
+func ListDashboardConfig() []DashboardConfig {
+	dashboardConfig := []DashboardConfig{}
+	GetDB().Find(&dashboardConfig)
+	return dashboardConfig
 }
 
 // ShowDashboardConfig function
@@ -55,13 +52,12 @@ func ShowDashboardConfig(id string) *DashboardConfig {
 }
 
 // ModifyDashboardConfig function
-func ModifyDashboardConfig(id string) *DashboardConfig {
-	dashboard := &DashboardConfig{}
+func (dashboard *DashboardConfig) ModifyDashboardConfig(id string) {
 	err := GetDB().Table("dashboards").Where("id = ?", id).Update(dashboard).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return dashboard
 }
 
 // DeleteDashboardConfig function

@@ -46,12 +46,9 @@ func (notification_slack *NotificationSlack) CreateNotificationSlack() map[strin
 }
 
 // ListNotificationSlack function
-func ListNotificationSlack() *NotificationSlack {
-	notificationSlack := &NotificationSlack{}
-	err := GetDB().Table("notification_slacks").Find(notificationSlack).Error
-	if err != nil {
-		return nil
-	}
+func ListNotificationSlack() []NotificationSlack {
+	notificationSlack := []NotificationSlack{}
+	GetDB().Find(&notificationSlack)
 	return notificationSlack
 }
 
@@ -66,13 +63,12 @@ func ShowNotificationSlack(id string) *NotificationSlack {
 }
 
 // ModifyNotificationSlack function
-func ModifyNotificationSlack(id string) *NotificationSlack {
-	notificationSlack := &NotificationSlack{}
-	err := GetDB().Table("notification_slacks").Where("id = ?", id).Update(notificationSlack).Error
+func (notification_slack *NotificationSlack) ModifyNotificationSlack(id string) {
+	err := GetDB().Table("notification_slacks").Where("id = ?", id).Update(notification_slack).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return notificationSlack
 }
 
 // DeleteNotificationSlack function
@@ -105,19 +101,16 @@ func (notification_history *NotificationHistory) CreateNotificationHistory() map
 }
 
 // ListNotificationHistory function
-func ListNotificationHistory() *NotificationHistory {
-	notificationHistory := &NotificationHistory{}
-	err := GetDB().Table("notification_historys").Find(notificationHistory).Error
-	if err != nil {
-		return nil
-	}
+func ListNotificationHistory() []NotificationHistory {
+	notificationHistory := []NotificationHistory{}
+	GetDB().Find(&notificationHistory)
 	return notificationHistory
 }
 
 // ShowNotificationHistory function
 func ShowNotificationHistory(id string) *NotificationHistory {
 	notificationHistory := &NotificationHistory{}
-	err := GetDB().Table("notification_historys").Where("id = ?", id).First(notificationHistory).Error
+	err := GetDB().Table("notification_histories").Where("id = ?", id).First(notificationHistory).Error
 	if err != nil {
 		return nil
 	}
@@ -125,17 +118,16 @@ func ShowNotificationHistory(id string) *NotificationHistory {
 }
 
 // ModifyNotificationHistory function
-func ModifyNotificationHistory(id string) *NotificationHistory {
-	notificationHistory := &NotificationHistory{}
-	err := GetDB().Table("notification_historys").Where("id = ?", id).Update(notificationHistory).Error
+func (notification_history *NotificationHistory) ModifyNotificationHistory(id string) {
+	err := GetDB().Table("notification_histories").Where("id = ?", id).Update(notification_history).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return notificationHistory
 }
 
 // DeleteNotificationHistory function
 func DeleteNotificationHistory(id string) {
 	notificationHistory := &NotificationHistory{}
-	GetDB().Table("notification_historys").Where("id = ?", id).Delete(notificationHistory)
+	GetDB().Table("notification_histories").Where("id = ?", id).Delete(notificationHistory)
 }

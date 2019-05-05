@@ -50,13 +50,10 @@ func (http_monitoring_configs *HTTPMonitoringConfig) CreateHTTPMonitoringConfig(
 }
 
 // ListHTTPMonitoringConfig function
-func ListHTTPMonitoringConfig() *HTTPMonitoringConfig {
-	httpMonitoringConfigs := &HTTPMonitoringConfig{}
-	err := GetDB().Table("http_monitoring_configs").Find(httpMonitoringConfigs).Error
-	if err != nil {
-		return nil
-	}
-	return httpMonitoringConfigs
+func ListHTTPMonitoringConfig() []HTTPMonitoringConfig {
+	httpMonitoringConfig := []HTTPMonitoringConfig{}
+	GetDB().Find(&httpMonitoringConfig)
+	return httpMonitoringConfig
 }
 
 // ShowHTTPMonitoringConfig function
@@ -70,13 +67,12 @@ func ShowHTTPMonitoringConfig(id string) *HTTPMonitoringConfig {
 }
 
 // ModifyHTTPMonitoringConfig function
-func ModifyHTTPMonitoringConfig(id string) *HTTPMonitoringConfig {
-	httpMonitoringConfigs := &HTTPMonitoringConfig{}
-	err := GetDB().Table("http_monitoring_configs").Where("id = ?", id).Update(httpMonitoringConfigs).Error
+func (http_monitoring_configs *HTTPMonitoringConfig) ModifyHTTPMonitoringConfig(id string) {
+	err := GetDB().Table("http_monitoring_configs").Where("id = ?", id).Update(http_monitoring_configs).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return httpMonitoringConfigs
 }
 
 // DeleteHTTPMonitoringConfig function
@@ -114,13 +110,10 @@ func (dns_monitoring_configs *DNSMonitoringConfig) CreateDNSMonitoringConfig() m
 }
 
 // ListDNSMonitoringConfig function
-func ListDNSMonitoringConfig() *DNSMonitoringConfig {
-	dnsMonitoringConfigs := &DNSMonitoringConfig{}
-	err := GetDB().Table("dns_monitoring_configs").Find(dnsMonitoringConfigs).Error
-	if err != nil {
-		return nil
-	}
-	return dnsMonitoringConfigs
+func ListDNSMonitoringConfig() []DNSMonitoringConfig {
+	dnsMonitoringConfig := []DNSMonitoringConfig{}
+	GetDB().Find(&dnsMonitoringConfig)
+	return dnsMonitoringConfig
 }
 
 // ShowDNSMonitoringConfig function
@@ -134,13 +127,12 @@ func ShowDNSMonitoringConfig(id string) *DNSMonitoringConfig {
 }
 
 // ModifyDNSMonitoringConfig function
-func ModifyDNSMonitoringConfig(id string) *DNSMonitoringConfig {
-	dnsMonitoringConfigs := &DNSMonitoringConfig{}
-	err := GetDB().Table("dns_monitoring_configs").Where("id = ?", id).Update(dnsMonitoringConfigs).Error
+func (dns_monitoring_configs *DNSMonitoringConfig) ModifyDNSMonitoringConfig(id string) {
+	err := GetDB().Table("dns_monitoring_configs").Where("id = ?", id).Update(dns_monitoring_configs).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return dnsMonitoringConfigs
 }
 
 // DeleteDNSMonitoringConfig function

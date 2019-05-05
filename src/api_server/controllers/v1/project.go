@@ -41,21 +41,27 @@ var ShowProject = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyProject controller
-var ModifyProject = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//projectID := params["project_id"]
-
+// ModifyAndShowProject controller
+var ModifyAndShowProject = func(w http.ResponseWriter, r *http.Request) {
 	project := &models.Project{}
-	err := json.NewDecoder(r.Body).Decode(project) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	vars := mux.Vars(r)
+
+	projectID := vars["project_id"]
+	existProject := ShowProject
+	if existProject == nil {
 		return
 	}
 
-	//project := models.ModifyProject(projectID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&project); err != nil {
+		println(err)
+		return
+	}
+	project.ModifyProject(projectID)
 	resp := common.Message(true, "success")
-	resp["project"] = project
+
+	respProject := models.ShowProject(projectID)
+	resp["project"] = respProject
 	common.Respond(w, resp)
 }
 

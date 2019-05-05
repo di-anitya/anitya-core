@@ -41,21 +41,27 @@ var ShowProbePoint = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyProbePoint controller
-var ModifyProbePoint = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//probepointID := params["probepoint_id"]
-
+// ModifyAndShowProbePoint controller
+var ModifyAndShowProbePoint = func(w http.ResponseWriter, r *http.Request) {
 	probepoint := &models.ProbePoint{}
-	err := json.NewDecoder(r.Body).Decode(probepoint) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	vars := mux.Vars(r)
+
+	probepointID := vars["probepoint_id"]
+	existProbePoint := ShowProbePoint
+	if existProbePoint == nil {
 		return
 	}
 
-	//probepoint := models.ModifyProbePoint(probepointID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&probepoint); err != nil {
+		println(err)
+		return
+	}
+	probepoint.ModifyProbePoint(probepointID)
 	resp := common.Message(true, "success")
-	resp["probepoint"] = probepoint
+
+	respProbePoint := models.ShowProbePoint(probepointID)
+	resp["probepoint"] = respProbePoint
 	common.Respond(w, resp)
 }
 

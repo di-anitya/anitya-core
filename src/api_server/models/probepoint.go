@@ -44,12 +44,9 @@ func (probepoint *ProbePoint) CreateProbePoint() map[string]interface{} {
 }
 
 // ListProbePoint function
-func ListProbePoint() *ProbePoint {
-	probepoint := &ProbePoint{}
-	err := GetDB().Table("probepoints").Find(probepoint).Error
-	if err != nil {
-		return nil
-	}
+func ListProbePoint() []ProbePoint {
+	probepoint := []ProbePoint{}
+	GetDB().Find(&probepoint)
 	return probepoint
 }
 
@@ -64,13 +61,12 @@ func ShowProbePoint(id string) *ProbePoint {
 }
 
 // ModifyProbePoint function
-func ModifyProbePoint(id string) *ProbePoint {
-	probepoint := &ProbePoint{}
+func (probepoint *ProbePoint) ModifyProbePoint(id string) {
 	err := GetDB().Table("probepoints").Where("id = ?", id).Update(probepoint).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return probepoint
 }
 
 // DeleteProbePoint function

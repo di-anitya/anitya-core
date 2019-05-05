@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -43,6 +44,7 @@ func (user *User) ValidateUser() (map[string]interface{}, bool) {
 	// check for errors and duplicate emails
 	err := GetDB().Table("users").Where("name = ?", user.Name).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
+		println(err)
 		return common.Message(false, "Connection error. Please retry"), false
 	}
 
@@ -72,12 +74,9 @@ func (user *User) CreateUser() map[string]interface{} {
 }
 
 // ListUser function
-func ListUser() *User {
-	user := &User{}
-	err := GetDB().Table("users").Find(user).Error
-	if err != nil {
-		return nil
-	}
+func ListUser() []User {
+	user := []User{}
+	GetDB().Find(&user)
 	return user
 }
 
@@ -86,23 +85,24 @@ func ShowUser(id string) *User {
 	user := &User{}
 	err := GetDB().Table("users").Where("id = ?", id).First(user).Error
 	if err != nil {
+		println(err)
 		return nil
 	}
 	return user
 }
 
 // ModifyUser function
-func ModifyUser(id string) *User {
-	user := &User{}
+func (user *User) ModifyUser(id string) {
 	err := GetDB().Table("users").Where("id = ?", id).Update(user).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return user
 }
 
 // DeleteUser function
 func DeleteUser(id string) {
 	user := &User{}
-	GetDB().Table("users").Where("id = ?", id).Delete(user)
+	fmt.Println("id:", id)
+	GetDB().Table("users").Unscoped().Where("id = ?", id).Delete(user)
 }

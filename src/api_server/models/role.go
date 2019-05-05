@@ -11,8 +11,8 @@ import (
 type Role struct {
 	Base
 	ProjectID uuid.UUID `gorm:"type:char(36);" json:"project_id"`
-	Name      string    `sql:"size:60"`
-	IsAdmin   bool      `sql:"size:60"`
+	Name      string    `sql:"size:60" json:"role_name"`
+	IsAdmin   bool      `sql:"size:60;DEFAULT:false;" json:"is_admin"`
 }
 
 // ValidateRole function
@@ -54,12 +54,9 @@ func (role *Role) CreateRole() map[string]interface{} {
 }
 
 // ListRole function
-func ListRole() *Role {
-	role := &Role{}
-	err := GetDB().Table("roles").Find(role).Error
-	if err != nil {
-		return nil
-	}
+func ListRole() []Role {
+	role := []Role{}
+	GetDB().Find(&role)
 	return role
 }
 
@@ -74,13 +71,12 @@ func ShowRole(id string) *Role {
 }
 
 // ModifyRole function
-func ModifyRole(id string) *Role {
-	role := &Role{}
+func (role *Role) ModifyRole(id string) {
 	err := GetDB().Table("roles").Where("id = ?", id).Update(role).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return role
 }
 
 // DeleteRole function

@@ -41,21 +41,27 @@ var ShowRole = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyRole controller
-var ModifyRole = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//roleID := params["role_id"]
-
+// ModifyAndShowRole controller
+var ModifyAndShowRole = func(w http.ResponseWriter, r *http.Request) {
 	role := &models.Role{}
-	err := json.NewDecoder(r.Body).Decode(role) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	vars := mux.Vars(r)
+
+	roleID := vars["role_id"]
+	existRole := ShowRole
+	if existRole == nil {
 		return
 	}
 
-	//role := models.ModifyRole(roleID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&role); err != nil {
+		println(err)
+		return
+	}
+	role.ModifyRole(roleID)
 	resp := common.Message(true, "success")
-	resp["role"] = role
+
+	respRole := models.ShowRole(roleID)
+	resp["role"] = respRole
 	common.Respond(w, resp)
 }
 

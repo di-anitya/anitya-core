@@ -33,21 +33,27 @@ var ShowDashboardConfig = func(w http.ResponseWriter, r *http.Request) {
 	common.Respond(w, resp)
 }
 
-// ModifyDashboardConfig controller
-var ModifyDashboardConfig = func(w http.ResponseWriter, r *http.Request) {
-	//params := mux.Vars(r)
-	//dashboardID := params["dashboard_id"]
-
+// ModifyAndShowDashboardConfig controller
+var ModifyAndShowDashboardConfig = func(w http.ResponseWriter, r *http.Request) {
 	dashboard := &models.DashboardConfig{}
-	err := json.NewDecoder(r.Body).Decode(dashboard) // リクエストのbody部を構造体にデコード
-	if err != nil {
-		common.Respond(w, common.Message(false, "Invalid request"))
+	vars := mux.Vars(r)
+
+	dashboardID := vars["dashboard_id"]
+	existDashboard := ShowDashboardConfig
+	if existDashboard == nil {
 		return
 	}
 
-	//dashboard := models.ModifyDashboardConfig(dashboardID)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&dashboard); err != nil {
+		println(err)
+		return
+	}
+	dashboard.ModifyDashboardConfig(dashboardID)
 	resp := common.Message(true, "success")
-	resp["dashboard"] = dashboard
+
+	respDashboard := models.ShowDashboardConfig(dashboardID)
+	resp["dashboard"] = respDashboard
 	common.Respond(w, resp)
 }
 

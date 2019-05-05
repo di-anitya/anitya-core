@@ -51,12 +51,9 @@ func (project *Project) CreateProject() map[string]interface{} {
 }
 
 // ListProject function
-func ListProject() *Project {
-	project := &Project{}
-	err := GetDB().Table("projects").Find(project).Error
-	if err != nil {
-		return nil
-	}
+func ListProject() []Project {
+	project := []Project{}
+	GetDB().Find(&project)
 	return project
 }
 
@@ -71,13 +68,12 @@ func ShowProject(id string) *Project {
 }
 
 // ModifyProject function
-func ModifyProject(id string) *Project {
-	project := &Project{}
+func (project *Project) ModifyProject(id string) {
 	err := GetDB().Table("projects").Where("id = ?", id).Update(project).Error
 	if err != nil {
-		return nil
+		println(err)
+		return
 	}
-	return project
 }
 
 // DeleteProject function
