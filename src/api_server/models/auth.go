@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/dgrijalva/jwt-go"
@@ -14,18 +15,20 @@ import (
 // Token function
 type Token struct {
 	jwt.StandardClaims
-	UserID uuid.UUID `gorm:"type:char(36);"`
-	Token  string    `json:"token"`
+	UserID    uuid.UUID `gorm:"type:char(36);"`
+	ProjectID uuid.UUID `gorm:"type:char(36);"`
+	Token     string    `json:"token"`
 }
 
 // PublishToken function
-func PublishToken(username, password string) map[string]interface{} {
+func PublishToken(username, password string, projectID uuid.UUID) map[string]interface{} {
 
+	fmt.Println(username, projectID)
 	user := &User{}
-	err := GetDB().Table("users").Where("name = ?", username).First(user).Error
+	err := GetDB().Table("users").Where("name = ? and project_id = ?", username, projectID).First(user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return common.Message(false, "'name' not found")
+			return common.Message(false, "user is not found")
 		}
 		return common.Message(false, "Connection error. Please retry")
 	}
@@ -37,7 +40,7 @@ func PublishToken(username, password string) map[string]interface{} {
 	user.Password = ""
 
 	// Create JWT token
-	tk := &Token{UserID: user.ID}
+	tk := &Token{UserID: user.ID, ProjectID: user.ProjectID}
 	tkHS256 := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, _ := tkHS256.SignedString([]byte(os.Getenv("token_password")))
 	tk.Token = tokenString //Store the token in the response

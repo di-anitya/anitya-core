@@ -10,8 +10,8 @@ import (
 type ProbePoint struct {
 	Base
 	ProjectID uuid.UUID `gorm:"type:char(36);" json:"project_id"`
-	Name      int64     `sql:"size:60"`
-	IPAddress string    `sql:"size:60"`
+	Name      int64     `sql:"size:60" json:"name"`
+	IPAddress string    `sql:"size:60" json:"ip_address"`
 }
 
 // ValidateProbePoint function

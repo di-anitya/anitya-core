@@ -18,6 +18,6 @@ var PublishToken = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := models.PublishToken(user.Name, user.Password)
+	resp := models.PublishToken(user.Name, user.Password, user.ProjectID)
 	common.Respond(w, resp)
 }
