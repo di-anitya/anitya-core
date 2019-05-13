@@ -37,3 +37,7 @@ if [ $(get_os_distribution) == "redhat" -o $(get_os_distribution) == "fedora"  ]
   echo "** enabling anitya-api.service"
   systemctl enable anitya-api.service
 fi
+
+
+protoc --proto_path ../src/grpc/proto --go_out=plugins=grpc:../src/grpc/proto ../src/grpc/proto/MonitoringJob.proto
+\cp -frp ../src/grpc/proto/* ../../anitya-conductor/src/grpc/proto/ 
